@@ -6,9 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -33,13 +37,19 @@ public class BancoController {
     }
 
     @PostMapping("/")
-    public ResponseEntity<?> crear(@RequestBody Banco banco){
+    public ResponseEntity<?> crear(@Valid @RequestBody Banco banco, BindingResult result){
+        if(result.hasErrors()){
+            return validar(result);
+        }
         Banco bancoDB = bancoService.guardar(banco);
         return ResponseEntity.status(HttpStatus.CREATED).body(bancoDB);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> editar(@RequestBody Banco banco, @PathVariable Long id){
+    public ResponseEntity<?> editar(@Valid @RequestBody Banco banco, BindingResult result, @PathVariable Long id){
+        if(result.hasErrors()){
+            return validar(result);
+        }
         Optional<Banco> bancoOptional = bancoService.porId(id);
         if(bancoOptional.isPresent()){
             Banco bancoDB = bancoOptional.get();
@@ -59,5 +69,13 @@ public class BancoController {
         }
         System.out.println("Here 3");
         return ResponseEntity.notFound().build();
+    }
+
+    private static ResponseEntity<Map<String, String>> validar(BindingResult result) {
+        Map<String, String> errores = new HashMap<>();
+        result.getFieldErrors().forEach(err -> {
+            errores.put(err.getField(),"El campo "+err.getField()+" "+err.getDefaultMessage());
+        });
+        return ResponseEntity.badRequest().body(errores);
     }
 }

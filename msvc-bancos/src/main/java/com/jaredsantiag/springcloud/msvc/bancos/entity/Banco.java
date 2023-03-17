@@ -1,6 +1,7 @@
 package com.jaredsantiag.springcloud.msvc.bancos.entity;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
 
 @Entity
 @Table(name="bancos")
@@ -10,6 +11,7 @@ public class Banco {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotEmpty
     private String nombre;
 
     public Long getId() {
