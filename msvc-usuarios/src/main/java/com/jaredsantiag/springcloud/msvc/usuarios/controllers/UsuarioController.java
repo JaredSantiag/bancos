@@ -23,7 +23,8 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> mostarDetalle(Long id){
+    public ResponseEntity<?> mostarDetalle(@PathVariable Long id){
+        System.out.printf("El Id es: "+String.valueOf(id));
         Optional<Usuario> usuarioOptional = usuarioService.porId(id);
         if(usuarioOptional.isPresent()){
             return ResponseEntity.ok(usuarioOptional.get());

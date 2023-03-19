@@ -1,7 +1,9 @@
 package com.jaredsantiag.springcloud.msvc.bancos.controllers;
 
-import com.jaredsantiag.springcloud.msvc.bancos.entity.Banco;
+import com.jaredsantiag.springcloud.msvc.bancos.models.Usuario;
+import com.jaredsantiag.springcloud.msvc.bancos.models.entity.Banco;
 import com.jaredsantiag.springcloud.msvc.bancos.services.BancoService;
+import feign.FeignException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,10 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 
 @Controller
@@ -68,6 +67,57 @@ public class BancoController {
             return ResponseEntity.noContent().build();
         }
         System.out.println("Here 3");
+        return ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/asignar_usuario/{bancoId}")
+    public ResponseEntity<?> asignarUsuario(@RequestBody Usuario usuario, @PathVariable Long bancoId){
+        Optional<Usuario> o;
+        try{
+            o = bancoService.asignarUsuario(usuario, bancoId);
+        } catch (FeignException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("mensaje", "No exsite el id del usuario " +
+                            "o error con la comunicacion: "+e.getMessage()));
+        }
+
+        if(o.isPresent()){
+            return ResponseEntity.status(HttpStatus.CREATED).body(o.get());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @PostMapping("/crear_usuario/{bancoId}")
+    public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario, @PathVariable Long bancoId){
+        Optional<Usuario> o;
+        try{
+            o = bancoService.crearUsuario(usuario, bancoId);
+        } catch (FeignException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("mensaje", "No se pudo crear el usuario " +
+                            "o error con la comunicacion: "+e.getMessage()));
+        }
+
+        if(o.isPresent()){
+            return ResponseEntity.status(HttpStatus.CREATED).body(o.get());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/eliminar_usuario/{bancoId}")
+    public ResponseEntity<?> eliminarUsuario(@RequestBody Usuario usuario, @PathVariable Long bancoId){
+        Optional<Usuario> o;
+        try{
+            o = bancoService.eliminarUsuario(usuario, bancoId);
+        } catch (FeignException e){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("mensaje", "No exsite el id del usuario " +
+                            "o error con la comunicacion: "+e.getMessage()));
+        }
+
+        if(o.isPresent()){
+            return ResponseEntity.status(HttpStatus.OK).body(o.get());
+        }
         return ResponseEntity.notFound().build();
     }
 
