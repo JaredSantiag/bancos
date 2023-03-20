@@ -27,7 +27,8 @@ public class BancoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> detalle(@PathVariable Long id){
-        Optional<Banco> optional = bancoService.porId(id);
+        //Optional<Banco> optional = bancoService.porId(id);
+        Optional<Banco> optional = bancoService.porIdConUsuarios(id);
         if (optional.isPresent()) {
             return ResponseEntity.ok(optional.get());
         }
@@ -119,6 +120,12 @@ public class BancoController {
             return ResponseEntity.status(HttpStatus.OK).body(o.get());
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/eliminar_curso_usuario/{id}")
+    public ResponseEntity<?> eliminarBancoUsuarioPorId(@PathVariable Long id){
+        bancoService.eliminarBancoUsuarioPorId(id);
+        return ResponseEntity.noContent().build();
     }
 
     private static ResponseEntity<Map<String, String>> validar(BindingResult result) {

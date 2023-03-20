@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class BancoServiceImpl implements BancoService {
@@ -34,6 +35,23 @@ public class BancoServiceImpl implements BancoService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<Banco> porIdConUsuarios(Long id) {
+        Optional<Banco> o = bancoRepository.findById(id);
+        if(o.isPresent()){
+            Banco banco = o.get();
+            if(!banco.getBancoUsuarios().isEmpty()){
+                List<Long> ids = banco.getBancoUsuarios().stream().map(bu -> bu.getUsuarioId())
+                        .collect(Collectors.toList());
+                List<Usuario> usuarios = client.obtenerUsuariosPorBanco(ids);
+                banco.setUsuarios(usuarios);
+            }
+            return Optional.of(banco);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     @Transactional
     public Banco guardar(Banco banco) {
         return bancoRepository.save(banco);
@@ -43,6 +61,12 @@ public class BancoServiceImpl implements BancoService {
     @Transactional
     public void eliminar(Long id) {
         bancoRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void eliminarBancoUsuarioPorId(Long id) {
+        bancoRepository.eliminarBancoUsuarioPorId(id);
     }
 
     @Override

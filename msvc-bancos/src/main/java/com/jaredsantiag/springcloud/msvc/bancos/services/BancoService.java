@@ -9,8 +9,13 @@ import java.util.Optional;
 public interface BancoService {
     List<Banco> listar();
     Optional<Banco> porId(Long id);
+    Optional<Banco> porIdConUsuarios(Long id);
     Banco guardar(Banco banco);
     void eliminar(Long id);
+
+
+    void eliminarBancoUsuarioPorId(Long id);
+
 
     Optional<Usuario> asignarUsuario(Usuario usuario, Long bancoId);
     Optional<Usuario> crearUsuario(Usuario usuario, Long bancoId);

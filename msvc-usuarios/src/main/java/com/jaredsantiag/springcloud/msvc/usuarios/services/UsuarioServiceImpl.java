@@ -1,5 +1,6 @@
 package com.jaredsantiag.springcloud.msvc.usuarios.services;
 
+import com.jaredsantiag.springcloud.msvc.usuarios.clients.BancoClientRest;
 import com.jaredsantiag.springcloud.msvc.usuarios.moles.entity.Usuario;
 import com.jaredsantiag.springcloud.msvc.usuarios.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ public class UsuarioServiceImpl implements  UsuarioService{
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private BancoClientRest client;
 
     @Override
     @Transactional(readOnly = true)
@@ -37,6 +41,13 @@ public class UsuarioServiceImpl implements  UsuarioService{
     @Transactional
     public void eliminar(Long id) {
         usuarioRepository.deleteById(id);
+        client.eliminarBancoUsuarioPorId(id);
+    }
+
+    @Override
+    @Transactional
+    public List<Usuario> listarPorIds(Iterable<Long> ids) {
+        return (List<Usuario>) usuarioRepository.findAllById(ids);
     }
 
     @Override
