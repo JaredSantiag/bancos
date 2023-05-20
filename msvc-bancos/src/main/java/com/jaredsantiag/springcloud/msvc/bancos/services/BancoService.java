@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface BancoService {
     List<Banco> listar();
     Optional<Banco> porId(Long id);
-    Optional<Banco> porIdConUsuarios(Long id);
+    Optional<Banco> porIdConUsuarios(Long id, String token);
     Banco guardar(Banco banco);
     void eliminar(Long id);
 
@@ -17,9 +17,9 @@ public interface BancoService {
     void eliminarBancoUsuarioPorId(Long id);
 
 
-    Optional<Usuario> asignarUsuario(Usuario usuario, Long bancoId);
-    Optional<Usuario> crearUsuario(Usuario usuario, Long bancoId);
-    Optional<Usuario> eliminarUsuario(Usuario usuario, Long bancoId);
+    Optional<Usuario> asignarUsuario(Usuario usuario, Long bancoId, String token);
+    Optional<Usuario> crearUsuario(Usuario usuario, Long bancoId, String token);
+    Optional<Usuario> eliminarUsuario(Usuario usuario, Long bancoId, String token);
 
 
 }

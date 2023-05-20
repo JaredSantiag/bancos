@@ -8,6 +8,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,6 +17,9 @@ import java.util.*;
 
 @RestController
 public class UsuarioController {
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     private UsuarioService usuarioService;
@@ -66,6 +70,7 @@ public class UsuarioController {
                             .singletonMap("mensajes","Ya existe un usuario con ese correo electronico"));
         }
 
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.guardar(usuario));
     }
 
@@ -89,7 +94,7 @@ public class UsuarioController {
 
             usuarioDB.setNombre(usuario.getNombre());
             usuarioDB.setEmail(usuario.getEmail());
-            usuarioDB.setPassword(usuario.getPassword());
+            usuarioDB.setPassword(passwordEncoder.encode(usuario.getPassword()));
 
             return ResponseEntity.status(HttpStatus.CREATED).body(usuarioService.guardar(usuarioDB));
         }
@@ -116,7 +121,17 @@ public class UsuarioController {
         return Collections.singletonMap("code", code);
     }
 
-    private static ResponseEntity<Map<String, String>> validar(BindingResult result) {
+    @GetMapping
+    public ResponseEntity<?> loginByEmail(@RequestParam String email){
+        Optional o = usuarioService.porEmail(email);
+        if(o.isPresent()){
+            return ResponseEntity.ok(o.get());
+        }
+        return ResponseEntity.notFound().build();
+
+    }
+
+    private ResponseEntity<Map<String, String>> validar(BindingResult result) {
         Map<String, String> errores = new HashMap<>();
         result.getFieldErrors().forEach(err -> {
             errores.put(err.getField(),"El campo "+err.getField()+" "+err.getDefaultMessage());

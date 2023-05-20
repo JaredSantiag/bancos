@@ -36,14 +36,14 @@ public class BancoServiceImpl implements BancoService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Banco> porIdConUsuarios(Long id) {
+    public Optional<Banco> porIdConUsuarios(Long id, String token) {
         Optional<Banco> o = bancoRepository.findById(id);
         if(o.isPresent()){
             Banco banco = o.get();
             if(!banco.getBancoUsuarios().isEmpty()){
                 List<Long> ids = banco.getBancoUsuarios().stream().map(bu -> bu.getUsuarioId())
                         .collect(Collectors.toList());
-                List<Usuario> usuarios = client.obtenerUsuariosPorBanco(ids);
+                List<Usuario> usuarios = client.obtenerUsuariosPorBanco(ids, token);
                 banco.setUsuarios(usuarios);
             }
             return Optional.of(banco);
@@ -71,10 +71,10 @@ public class BancoServiceImpl implements BancoService {
 
     @Override
     @Transactional
-    public Optional<Usuario> asignarUsuario(Usuario usuario, Long bancoId) {
+    public Optional<Usuario> asignarUsuario(Usuario usuario, Long bancoId, String token) {
         Optional<Banco> o = bancoRepository.findById(bancoId);
         if(o.isPresent()){
-            Usuario usuarioMsvc = client.detalle(usuario.getId());
+            Usuario usuarioMsvc = client.detalle(usuario.getId(), token);
 
             Banco banco = o.get();
             BancoUsuario bancoUsuario = new BancoUsuario();
@@ -91,10 +91,10 @@ public class BancoServiceImpl implements BancoService {
 
     @Override
     @Transactional
-    public Optional<Usuario> crearUsuario(Usuario usuario, Long bancoId) {
+    public Optional<Usuario> crearUsuario(Usuario usuario, Long bancoId, String token) {
         Optional<Banco> o = bancoRepository.findById(bancoId);
         if(o.isPresent()){
-            Usuario usuarioNuevoMsvc = client.crear(usuario);
+            Usuario usuarioNuevoMsvc = client.crear(usuario, token);
 
             Banco banco = o.get();
             BancoUsuario bancoUsuario = new BancoUsuario();
@@ -111,10 +111,10 @@ public class BancoServiceImpl implements BancoService {
 
     @Override
     @Transactional
-    public Optional<Usuario> eliminarUsuario(Usuario usuario, Long bancoId) {
+    public Optional<Usuario> eliminarUsuario(Usuario usuario, Long bancoId, String token) {
         Optional<Banco> o = bancoRepository.findById(bancoId);
         if(o.isPresent()){
-            Usuario usuarioMsvc = client.detalle(usuario.getId());
+            Usuario usuarioMsvc = client.detalle(usuario.getId(), token);
 
             Banco banco = o.get();
             BancoUsuario bancoUsuario = new BancoUsuario();

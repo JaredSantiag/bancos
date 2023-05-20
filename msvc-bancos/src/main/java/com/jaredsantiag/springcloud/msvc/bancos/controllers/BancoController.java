@@ -26,9 +26,9 @@ public class BancoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> detalle(@PathVariable Long id){
+    public ResponseEntity<?> detalle(@PathVariable Long id, @RequestHeader(value="Authorization", required = true) String token){
         //Optional<Banco> optional = bancoService.porId(id);
-        Optional<Banco> optional = bancoService.porIdConUsuarios(id);
+        Optional<Banco> optional = bancoService.porIdConUsuarios(id, token);
         if (optional.isPresent()) {
             return ResponseEntity.ok(optional.get());
         }
@@ -72,10 +72,10 @@ public class BancoController {
     }
 
     @PutMapping("/asignar_usuario/{bancoId}")
-    public ResponseEntity<?> asignarUsuario(@RequestBody Usuario usuario, @PathVariable Long bancoId){
+    public ResponseEntity<?> asignarUsuario(@RequestBody Usuario usuario, @PathVariable Long bancoId, @RequestHeader(value = "Authorization", required = true) String token){
         Optional<Usuario> o;
         try{
-            o = bancoService.asignarUsuario(usuario, bancoId);
+            o = bancoService.asignarUsuario(usuario, bancoId, token);
         } catch (FeignException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Collections.singletonMap("mensaje", "No exsite el id del usuario " +
@@ -89,10 +89,10 @@ public class BancoController {
     }
 
     @PostMapping("/crear_usuario/{bancoId}")
-    public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario, @PathVariable Long bancoId){
+    public ResponseEntity<?> crearUsuario(@RequestBody Usuario usuario, @PathVariable Long bancoId, @RequestHeader(value = "Authorization", required = true) String token){
         Optional<Usuario> o;
         try{
-            o = bancoService.crearUsuario(usuario, bancoId);
+            o = bancoService.crearUsuario(usuario, bancoId, token);
         } catch (FeignException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Collections.singletonMap("mensaje", "No se pudo crear el usuario " +
@@ -106,10 +106,10 @@ public class BancoController {
     }
 
     @DeleteMapping("/eliminar_usuario/{bancoId}")
-    public ResponseEntity<?> eliminarUsuario(@RequestBody Usuario usuario, @PathVariable Long bancoId){
+    public ResponseEntity<?> eliminarUsuario(@RequestBody Usuario usuario, @PathVariable Long bancoId, @RequestHeader(value = "Authorization", required = true) String token){
         Optional<Usuario> o;
         try{
-            o = bancoService.eliminarUsuario(usuario, bancoId);
+            o = bancoService.eliminarUsuario(usuario, bancoId, token);
         } catch (FeignException e){
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Collections.singletonMap("mensaje", "No exsite el id del usuario " +
@@ -122,7 +122,7 @@ public class BancoController {
         return ResponseEntity.notFound().build();
     }
 
-    @DeleteMapping("/eliminar_curso_usuario/{id}")
+    @DeleteMapping("/eliminar_banco_usuario/{id}")
     public ResponseEntity<?> eliminarBancoUsuarioPorId(@PathVariable Long id){
         bancoService.eliminarBancoUsuarioPorId(id);
         return ResponseEntity.noContent().build();
